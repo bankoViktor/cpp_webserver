@@ -19,6 +19,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{5a94bced-40fa-45fe-8f07-1c360bd09844}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cpp_webserver.cpp">
@@ -44,5 +47,33 @@
     <ClInclude Include="Server.h">
       <Filter>WebServer</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\_dashboard.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\dashboard.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\login.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\menu.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\page1.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\page2.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\style.css">
+      <Filter>Resource</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resources\RedirectionList.txt">
+      <Filter>Resource</Filter>
+    </Text>
   </ItemGroup>
 </Project>

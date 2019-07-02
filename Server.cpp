@@ -268,7 +268,7 @@ int Server::RequestHandling(Server* pServer, SOCKET clientSocket)
 	pServer->Transmit(clientSocket, &response);
 	
 	printf("Client %-4d %-10s %-30s %d %-15s %s %s\n", 
-		clientSocket, 
+		(int)clientSocket, 
 		request.GetMethod(), 
 		request.GetResourceName(),
 		(int)response.m_status,
