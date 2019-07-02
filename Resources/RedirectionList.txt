@@ -1,0 +1,2 @@
+[REDIRECTION]
+/=/_dashboard.htm
