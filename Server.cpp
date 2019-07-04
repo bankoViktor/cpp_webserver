@@ -76,24 +76,25 @@ MIMEType MIMEType::GetMEMIType(string sExt)
 
 
 
-Server::Server(unsigned int uiPort, const char* pszResourcePath)
+
+Server::Server(unsigned int port, string* psResourcePath, list<pair<string, string>>* pRedirectionList)
 {
-	m_port = uiPort;
-	m_resourcePath = pszResourcePath;
+	m_port = port;
+	m_psResourcePath = psResourcePath;
+	m_pRedirectionList = pRedirectionList;
 
 	int iResult;
 	WSADATA wsaData;
 	
-	// Èíèöèàëèçàöèÿ WSA
+	// Ð˜Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ WSA
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0)
 	{
 		//printf("WSAStartup failed: %d\n", iResult);
 		throw exception("WSAStartup failed", iResult);
 	}
-	printf("Server use %s\n\n", wsaData.szDescription);
 
-	// Îïðåäåëÿåì çíà÷åíèÿ â ñòðóêòóðå addrinfo (pResult)
+	// ÐžÐ¿Ñ€ÐµÐ´ÐµÐ»ÑÐµÐ¼ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð² ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ðµ addrinfo (pResult)
 	ADDRINFO hints;
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = PF_INET;
@@ -112,7 +113,7 @@ Server::Server(unsigned int uiPort, const char* pszResourcePath)
 		throw exception("Getaddrinfo failed", iResult);
 	}
 
-	// Ñîçäàåì socket
+	// Ð¡Ð¾Ð·Ð´Ð°ÐµÐ¼ socket
 	m_socket = socket(pResult->ai_family, pResult->ai_socktype, pResult->ai_protocol);
 	if (m_socket == INVALID_SOCKET)
 	{
@@ -121,7 +122,7 @@ Server::Server(unsigned int uiPort, const char* pszResourcePath)
 		throw exception("Creating socket failed", iResult);
 	}
 
-	// Ñâÿçûâàåì socket ñ ip-àäðåññîì è ïîðòîì
+	// Ð¡Ð²ÑÐ·Ñ‹Ð²Ð°ÐµÐ¼ socket Ñ ip-Ð°Ð´Ñ€ÐµÑÑÐ¾Ð¼ Ð¸ Ð¿Ð¾Ñ€Ñ‚Ð¾Ð¼
 	iResult = bind(m_socket, pResult->ai_addr, pResult->ai_addrlen);
 	if (iResult == SOCKET_ERROR)
 	{
@@ -132,10 +133,10 @@ Server::Server(unsigned int uiPort, const char* pszResourcePath)
 		throw exception("Binding socket failed", errn);
 	}
 
-	// Ïîñëå ñâÿçûâàíèÿ èíôîðìàöèÿ î àäðåñå íå íóæíà, îñâîáîäæàåì åå
+	// ÐŸÐ¾ÑÐ»Ðµ ÑÐ²ÑÐ·Ñ‹Ð²Ð°Ð½Ð¸Ñ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾ Ð°Ð´Ñ€ÐµÑÐµ Ð½Ðµ Ð½ÑƒÐ¶Ð½Ð°, Ð¾ÑÐ²Ð¾Ð±Ð¾Ð´Ð¶Ð°ÐµÐ¼ ÐµÐµ
 	FreeAddrInfo(pResult);
 
-	// Âêëþ÷àåì ïðîñëóøèâàíèå socket
+	// Ð’ÐºÐ»ÑŽÑ‡Ð°ÐµÐ¼ Ð¿Ñ€Ð¾ÑÐ»ÑƒÑˆÐ¸Ð²Ð°Ð½Ð¸Ðµ socket
 	iResult = listen(m_socket, m_maxConn);
 	if (iResult == SOCKET_ERROR)
 	{
@@ -143,6 +144,14 @@ Server::Server(unsigned int uiPort, const char* pszResourcePath)
 		WSACleanup();
 		throw exception("Listen socket failed", iResult);
 	}
+
+	const char* pszFormatStr = "%-25s %s\n";
+	const char* pszFormatInt = "%-25s %d\n";
+	printf(pszFormatStr, "Server use", wsaData.szDescription);
+	printf(pszFormatInt, "Port", m_port);
+	printf(pszFormatStr, "ResourcePath", m_psResourcePath->c_str());
+	printf(pszFormatInt, "Redirection List Size", pRedirectionList->size());
+	printf("\n");
 }
 
 Server::~Server()
@@ -255,7 +264,7 @@ int Server::RequestHandling(Server* pServer, SOCKET clientSocket)
 
 	int iResult = request.TryParse(message);
 	
-	// Ñòàíäàðòíûå çàãîëîâêè îòâåòà
+	// Ð¡Ñ‚Ð°Ð½Ð´Ð°Ñ€Ñ‚Ð½Ñ‹Ðµ Ð·Ð°Ð³Ð¾Ð»Ð¾Ð²ÐºÐ¸ Ð¾Ñ‚Ð²ÐµÑ‚Ð°
 	response.GetHeaders()->push_back(pair<string, string>("Host", "127.0.0.1"));
 	response.GetHeaders()->push_back(pair<string, string>("Connection", "close"));
 	response.GetHeaders()->push_back(pair<string, string>("Server", "MyServer"));
@@ -283,49 +292,49 @@ void Server::MakeResponse(Response * pResponse)
 {
 	Request * pReq = pResponse->GetRequest();
 
-	// Ñåðâåð äîñòóïåí?
+	// Ð¡ÐµÑ€Ð²ÐµÑ€ Ð´Ð¾ÑÑ‚ÑƒÐ¿ÐµÐ½?
 	if (false)
 	{
 		pResponse->m_status = HTTPSTATUS::ServiceUnavailable;
 		return;
 	}
 
-	// URI ñëèøêîì äëèííûé?
+	// URI ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð´Ð»Ð¸Ð½Ð½Ñ‹Ð¹?
 	if (false)
 	{
 		pResponse->m_status = HTTPSTATUS::URITooLong;
 		return;
 	}
 
-	// Çàïðîñ ïëîõî ñôîðìèðîâàí?
+	// Ð—Ð°Ð¿Ñ€Ð¾Ñ Ð¿Ð»Ð¾Ñ…Ð¾ ÑÑ„Ð¾Ñ€Ð¼Ð¸Ñ€Ð¾Ð²Ð°Ð½?
 	if (false)
 	{
 		pResponse->m_status = HTTPSTATUS::BadRequest;
 		return;
 	}
 
-	// Òðåáóåòñÿ àâòîðèçàöèÿ?
+	// Ð¢Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð°Ñ†Ð¸Ñ?
 	if (false)
 	{
 		pResponse->m_status = HTTPSTATUS::Unauthorized;
 		return;
 	}
 
-	//  Çàïðîñ ðàçðåøåí?
+	//  Ð—Ð°Ð¿Ñ€Ð¾Ñ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½?
 	if (false)
 	{
 		pResponse->m_status = HTTPSTATUS::Forbidden;
 		return;
 	}
 	
-	//  Ïîëåçíîé íàãðóçêè ñëèøêîì ìíîãî?
+	//  ÐŸÐ¾Ð»ÐµÐ·Ð½Ð¾Ð¹ Ð½Ð°Ð³Ñ€ÑƒÐ·ÐºÐ¸ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð¼Ð½Ð¾Ð³Ð¾?
 	if (false)
 	{
 		pResponse->m_status = HTTPSTATUS::PayloadTooLarge;
 		return;
 	}
 
-	//  Íåèçâåñòíûé èëè íå ïîääåðæèâàåìûé Content-* çàãîëîâîê?
+	//  ÐÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ñ‹Ð¹ Ð¸Ð»Ð¸ Ð½Ðµ Ð¿Ð¾Ð´Ð´ÐµÑ€Ð¶Ð¸Ð²Ð°ÐµÐ¼Ñ‹Ð¹ Content-* Ð·Ð°Ð³Ð¾Ð»Ð¾Ð²Ð¾Ðº?
 	if (false)
 	{
 		pResponse->m_status = HTTPSTATUS::NotImplemented;
@@ -335,7 +344,7 @@ void Server::MakeResponse(Response * pResponse)
 	string method(pReq->GetMethod());
 	if (method.compare("OPTIONS") == 0)
 	{
-		// Îáðàáîòàòü çàïðîñ OPTIONS
+		// ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ñ‚ÑŒ Ð·Ð°Ð¿Ñ€Ð¾Ñ OPTIONS
 		pResponse->m_status = HTTPSTATUS::OK;
 		return;
 	}
@@ -353,12 +362,12 @@ void Server::MakeResponse(Response * pResponse)
 		return;
 	}
 
-	// Ñâåðÿåìñÿ ñ òàáëèöåé ïåðåíàïðàâëåíèé
-	if (RedirectionList.empty() == false)
+	// Ð¡Ð²ÐµÑ€ÑÐµÐ¼ÑÑ Ñ Ñ‚Ð°Ð±Ð»Ð¸Ñ†ÐµÐ¹ Ð¿ÐµÑ€ÐµÐ½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ð¹
+	if (m_pRedirectionList->empty() == false)
 	{
-		for (pair<string, string> item : RedirectionList)
+		for (pair<string, string> item : *m_pRedirectionList)
 		{
-			if (item.first.compare(pReq->GetResourceName()) == 0)
+			if (item.first == pReq->GetResourceName())
 			{
 				pResponse->GetHeaders()->push_back(pair<string, string>("Location", item.second));
 				pResponse->m_status = HTTPSTATUS::TemporaryRedirect;
@@ -374,11 +383,11 @@ void Server::MakeResponse(Response * pResponse)
 
 	if (LoadFile(filename.c_str(), &pContent, &nContentLength, "rb"))
 	{
-		// Ïîëó÷àåì ðàñøèðåíèå
+		// ÐŸÐ¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ Ñ€Ð°ÑÑˆÐ¸Ñ€ÐµÐ½Ð¸Ðµ
 		string path(pReq->GetResourceName());
 		int idx_ext_sep = (int)path.find_last_of('.', (int)path.size());
 		string extension = path.substr(idx_ext_sep + 1, (int)path.size() - idx_ext_sep - 1);
-		// Îïðåäåëÿåì òèï
+		// ÐžÐ¿Ñ€ÐµÐ´ÐµÐ»ÑÐµÐ¼ Ñ‚Ð¸Ð¿
 		MIMEType contentType = MIMEType::GetMEMIType(extension);
 				
 		pResponse->SetContent(pContent, nContentLength);
@@ -403,7 +412,7 @@ void Server::MakeResponse(Response * pResponse)
 string Server::GetTruePathToResource(string pszResourceName)
 {
 	stringstream ss;
-	ss << m_resourcePath << pszResourceName;
+	ss << *m_psResourcePath << pszResourceName;
 	return ss.str();
 }
 
@@ -434,7 +443,6 @@ string Server::GetTruePathToResource(string pszResourceName)
 		 *pSize = 0;
 		 return false;
 	 }
-		
 
 	 fseek(pFile, 0, SEEK_END);
 	 int size = ftell(pFile);
@@ -459,5 +467,5 @@ string Server::GetTruePathToResource(string pszResourceName)
 	 return true;
  }
  
- // TODO ñðàçó îñâîáîäèòü ïàìàòü çàãðóæåííîãî ôàéëà
- // TODO ñëåø â êîíöå ïóòè, åñëè åñòü - óáðàòü
+ // TODO ÑÑ€Ð°Ð·Ñƒ Ð¾ÑÐ²Ð¾Ð±Ð¾Ð´Ð¸Ñ‚ÑŒ Ð¿Ð°Ð¼Ð°Ñ‚ÑŒ Ð·Ð°Ð³Ñ€ÑƒÐ¶ÐµÐ½Ð½Ð¾Ð³Ð¾ Ñ„Ð°Ð¹Ð»Ð°
+ // TODO ÑÐ»ÐµÑˆ Ð² ÐºÐ¾Ð½Ñ†Ðµ Ð¿ÑƒÑ‚Ð¸, ÐµÑÐ»Ð¸ ÐµÑÑ‚ÑŒ - ÑƒÐ±Ñ€Ð°Ñ‚ÑŒ

@@ -15,7 +15,7 @@ Response::~Response()
 	SafeReleaseArray(m_pContent);
 }
 
-void Response::GetData(char** ppResponseData, int* pLen) // возращенный указатель нужно освобождать вручную
+void Response::GetData(char** ppResponseData, int* pLen) // РІРѕР·СЂР°С‰РµРЅРЅС‹Р№ СѓРєР°Р·Р°С‚РµР»СЊ РЅСѓР¶РЅРѕ РѕСЃРІРѕР±РѕР¶РґР°С‚СЊ РІСЂСѓС‡РЅСѓСЋ
 {
 	ostringstream ss;
 	ss
@@ -50,11 +50,11 @@ const char* Response::GetStatusDescription(HTTPSTATUS status)
 	switch (status)
 	{
 	case HTTPSTATUS::None: pszResult = ""; break;
-		// 1** Информационные
+		// 1** В»РЅС„РѕСЂРјР°С†РёРѕРЅРЅС‹Рµ
 	case HTTPSTATUS::Continue: pszResult = "Continue"; break;
 	case HTTPSTATUS::SwitchingProtocol: pszResult = "SwitchingProtocol"; break;
 	case HTTPSTATUS::Processing: pszResult = "Processing"; break;
-		// 2** Успешные
+		// 2** вЂќСЃРїРµС€РЅС‹Рµ
 	case HTTPSTATUS::OK: pszResult = "OK"; break;
 	case HTTPSTATUS::Created: pszResult = "Created"; break;
 	case HTTPSTATUS::Accepted: pszResult = "Accepted"; break;
@@ -65,7 +65,7 @@ const char* Response::GetStatusDescription(HTTPSTATUS status)
 	case HTTPSTATUS::MultiStatus: pszResult = "MultiStatus"; break;
 	case HTTPSTATUS::AlreadyReported: pszResult = "AlreadyReported"; break;
 	case HTTPSTATUS::IMUsed: pszResult = "IMUsed"; break;
-		// 3** Перенаправления
+		// 3** С•РµСЂРµРЅР°РїСЂР°РІР»РµРЅРёВ¤
 	case HTTPSTATUS::MultipleChoices: pszResult = "MultipleChoices"; break;
 	case HTTPSTATUS::MovedPermanently: pszResult = "MovedPermanently"; break;
 	case HTTPSTATUS::Found: pszResult = "Found"; break;
@@ -75,7 +75,7 @@ const char* Response::GetStatusDescription(HTTPSTATUS status)
 	case HTTPSTATUS::SwitchProxy: pszResult = "SwitchProxy"; break;
 	case HTTPSTATUS::TemporaryRedirect: pszResult = "TemporaryRedirect"; break;
 	case HTTPSTATUS::PermanentRedirect: pszResult = ""; break;
-		// 4** Ошибка клиента
+		// 4** СњС€РёР±РєР° РєР»РёРµРЅС‚Р°
 	case HTTPSTATUS::BadRequest: pszResult = "BadRequest"; break;
 	case HTTPSTATUS::Unauthorized: pszResult = "Unauthorized"; break;
 	case HTTPSTATUS::PaymentRequired: pszResult = "PaymentRequired"; break;
@@ -108,7 +108,7 @@ const char* Response::GetStatusDescription(HTTPSTATUS status)
 	case HTTPSTATUS::UnavailableForLegalReasons: pszResult = "UnavailableForLegalReasons"; break;
 	case HTTPSTATUS::BadSendedRequest: pszResult = "BadSendedRequest"; break;
 	case HTTPSTATUS::ClientClosedRequest: pszResult = "ClientClosedRequest"; break;
-		// 5** Ошибка сервера
+		// 5** СњС€РёР±РєР° СЃРµСЂРІРµСЂР°
 	case HTTPSTATUS::InternalServerError: pszResult = "InternalServerError"; break;
 	case HTTPSTATUS::NotImplemented: pszResult = "NotImplemented"; break;
 	case HTTPSTATUS::BadGateway: pszResult = "BadGateway"; break;

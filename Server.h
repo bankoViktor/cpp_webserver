@@ -30,10 +30,10 @@ public:
 class Server
 {
 public:
-	list<pair<string, string>> RedirectionList;
+	list<pair<string, string>>* m_pRedirectionList;
 
 public:
-	Server(unsigned int port, const char* pszResourcePath);
+	Server(unsigned int port, string* psResourcePath, list<pair<string, string>>* pRedirectionList);
 	~Server();
 	void Run();
 	string Receive(SOCKET socket);
@@ -46,7 +46,7 @@ private:
 	unsigned int m_port;
 	SOCKET m_socket;
 	int m_maxConn = 5;
-	string m_resourcePath;
+	string* m_psResourcePath;
 
 private:
 	string GetTruePathToResource(string pszResourceName);
