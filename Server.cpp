@@ -20,12 +20,12 @@ MIMEType::MIMEType(const char* pszMimeType)
 {
 	string mimeType(pszMimeType);
 
-	int idx_type_sep = mimeType.find('/');
+	size_t idx_type_sep = mimeType.find('/');
 
 	if (idx_type_sep != -1)
 	{
 		Type = mimeType.substr(0, idx_type_sep);
-		SubType = mimeType.substr(idx_type_sep + 1, (int)mimeType.size() - idx_type_sep - 1);
+		SubType = mimeType.substr((size_t)idx_type_sep + 1, (size_t)mimeType.size() - idx_type_sep - 1);
 	}
 }
 
@@ -123,7 +123,7 @@ Server::Server(unsigned int port, string* psResourcePath, list<pair<string, stri
 	}
 
 	// Связываем socket с ip-адрессом и портом
-	iResult = bind(m_socket, pResult->ai_addr, pResult->ai_addrlen);
+	iResult = bind(m_socket, pResult->ai_addr, (int)pResult->ai_addrlen);
 	if (iResult == SOCKET_ERROR)
 	{
 		int errn = WSAGetLastError();
@@ -205,7 +205,7 @@ string Server::Receive(SOCKET socket)
 		{
 			string rec(recvbuf, receivedByte);
 
-			int pos = rec.find("\r\n\r\n");
+			size_t pos = rec.find("\r\n\r\n");
 			message += rec;
 
 			if (pos != -1 || receivedByte < 5)
@@ -222,10 +222,10 @@ string Server::Receive(SOCKET socket)
 
 void Server::Transmit(SOCKET socket, Response* pResponse)
 {
-	int size = 0;
+	size_t size = 0;
 	char* txbuf;
 
-	pResponse->GetData(&txbuf, &size);
+	pResponse->GetData(&txbuf, (int*)&size);
 	Transmit(socket, txbuf, size);
 	delete[] txbuf;
 
@@ -238,18 +238,21 @@ void Server::Transmit(SOCKET socket, Response* pResponse)
 	}
 }
 
-void Server::Transmit(SOCKET socket, const char * pData, const int size)
+void Server::Transmit(SOCKET socket, const char * pData, const size_t size)
 {
 	int totalSendedByte = 0;
 
-	while (totalSendedByte < size)
+	if (size > INT_MAX)
+		throw exception("Size data for transmitting is too large.");
+	else
 	{
-		int sendedByte = send(socket, pData + totalSendedByte, size - totalSendedByte, 0);
-		if (sendedByte == SOCKET_ERROR)
+		while ((unsigned int)totalSendedByte < size)
 		{
-			printf("Send failed: %d\n", WSAGetLastError());
+			int sendedByte = send(socket, pData + totalSendedByte, (int)size - totalSendedByte, NULL);
+			if (sendedByte == SOCKET_ERROR)
+				throw exception("Send failed", WSAGetLastError());
+			totalSendedByte += sendedByte;
 		}
-		totalSendedByte += sendedByte;
 	}
 }
 
@@ -386,10 +389,17 @@ void Server::MakeResponse(Response * pResponse)
 		// Получаем расширение
 		string path(pReq->GetResourceName());
 		int idx_ext_sep = (int)path.find_last_of('.', (int)path.size());
-		string extension = path.substr(idx_ext_sep + 1, (int)path.size() - idx_ext_sep - 1);
+		string extension = path.substr((size_t)idx_ext_sep + 1, (size_t)path.size() - idx_ext_sep - 1);
 		// Определяем тип
 		MIMEType contentType = MIMEType::GetMEMIType(extension);
 				
+		if (contentType.Type == "text" && contentType.SubType == "html")
+		{
+			string str_content(pContent);
+
+			SSI_Handle(&pContent, &nContentLength);
+		}
+
 		pResponse->SetContent(pContent, nContentLength);
 
 		if (nContentLength > 0)
@@ -418,11 +428,11 @@ string Server::GetTruePathToResource(string pszResourceName)
 
  void Server::Replace(string * pStr, int offset, char oldChar, char newChar)
  {
-	 int cur_pos = offset;
+	 size_t cur_pos = offset;
 
 	 while (1)
 	 {
-		 cur_pos = pStr->find(oldChar, cur_pos + 1);
+		 cur_pos = pStr->find(oldChar, (size_t)cur_pos + 1);
 		 if (cur_pos == -1)
 			 break;
 
@@ -445,19 +455,18 @@ string Server::GetTruePathToResource(string pszResourceName)
 	 }
 
 	 fseek(pFile, 0, SEEK_END);
-	 int size = ftell(pFile);
-
-	 char* pData = new char[size + 1];
-	 pData[size] = 0;
+	 long size = ftell(pFile) + 1;
+	 char* pData = new char[size];
+	 ZeroMemory(pData, size);
 
 	 fseek(pFile, 0, SEEK_SET);
 
-	 int iResult = 0;
+	 int iResult = fgetc(pFile);
 	 char* pCurr = pData;
-	 while ((iResult = getc(pFile)) != EOF)
+	 while (iResult != EOF)
 	 {
-		 *pCurr = (char)iResult;
-		 pCurr++;
+		 *pCurr++ = (char)iResult;
+		 iResult = fgetc(pFile);
 	 }
 
 	 fclose(pFile);
@@ -465,6 +474,58 @@ string Server::GetTruePathToResource(string pszResourceName)
 	 *ppData = pData;
 	 *pSize = size;
 	 return true;
+ }
+
+ bool Server::SSI_Handle(char** ppData, int* pSize)
+ {
+	 string pString(*ppData);
+	 size_t offset = 0;
+
+	 while (offset < pString.size())
+	 {
+		 size_t i_command = pString.find('#', offset);
+		 if (i_command != -1)
+		 {
+			 size_t i_commentBegin = pString.find_last_of("<!--", i_command) - 3;
+			 size_t i_commentEnd = pString.find("-->", i_command) + 3;
+			 if (i_commentBegin != -1 && i_commentEnd != -1)
+			 {
+				 size_t i_space = pString.find(' ', i_command);
+				 string command = pString.substr(i_command + 1, i_space - i_command - 1);
+				 if (command == "include")
+				 {
+					 size_t i_begin = pString.find('\"', i_space);
+					 if (i_begin != -1)
+					 {
+						 size_t i_end = pString.find('\"', i_begin + 1);
+						 if (i_end != -1)
+						 {
+							 string value = pString.substr(i_begin + 1, i_end - i_begin - 1);
+
+							 int nSubFileSize = 0;
+							 char* pSubFileData = nullptr;
+							 string filename = GetTruePathToResource('/' + value);
+							 if (LoadFile(filename.c_str(), &pSubFileData, &nSubFileSize, "r"))
+							 {
+								 string sub(pSubFileData);
+
+								 string result = pString.substr(0, i_commentBegin) + sub + pString.substr(i_commentEnd + 1, pString.size() - i_commentEnd - 1);
+								 size_t size = result.size();
+								 SafeReleaseArray(*ppData);
+								 *ppData = new char[size + 1];
+								 ZeroMemory(*ppData, size + (size_t)1);
+								 CopyMemory(*ppData, result.c_str(), size);
+								 *pSize = (int)size;
+								 return true;
+							 }
+						 }
+					 }
+				 }
+			 }
+		 }
+		 offset = i_command;
+	 }
+	 return false;
  }
  
  // TODO сразу освободить памать загруженного файла

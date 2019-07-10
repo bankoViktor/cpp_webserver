@@ -33,13 +33,13 @@ void Response::GetData(char** ppResponseData, int* pLen) // возращенны
 	ss << "\r\n";
 
 	string responseHead = ss.str();
-	int size = responseHead.size();
+	size_t size = responseHead.size();
 
 	char* buf = new char[size + 1];
 	buf[size] = 0;
 	memcpy(buf, responseHead.c_str(), size);
 
-	*pLen = size;
+	*pLen = (int)size;
 	*ppResponseData = buf;
 }
 

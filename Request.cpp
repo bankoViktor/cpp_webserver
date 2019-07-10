@@ -5,18 +5,18 @@ int Request::TryParse(string content)
 	if (content.empty())
 		return 8;
 
-	int idx_resource = content.find(" ");
+	size_t idx_resource = content.find(" ");
 	if (idx_resource == -1)
 		return 1;
 	m_sMethod = content.substr(0, idx_resource);
 
-	int idx_protocol = content.find(" ", idx_resource + 1);
+	size_t idx_protocol = content.find(" ", idx_resource + 1);
 	if (idx_protocol == -1)
 		return 2;
 	string uri = content.substr(idx_resource + 1, idx_protocol - idx_resource - 1);
 	
 	m_sResource = uri;
-	int idx_uri_param_begin = m_sResource.find('?');
+	size_t idx_uri_param_begin = m_sResource.find('?');
 	if (idx_uri_param_begin != -1)
 	{
 		m_sResource = uri.substr(0, idx_uri_param_begin);
@@ -24,14 +24,14 @@ int Request::TryParse(string content)
 		if ((uri.size() - idx_uri_param_begin - 1) == 0)
 			return 3;
 
-		int offset = idx_uri_param_begin + 1;
-		int idx_uri_param_sep = 0;
+		size_t offset = idx_uri_param_begin + 1;
+		size_t idx_uri_param_sep = 0;
 
 		while (idx_uri_param_sep != -1)
 		{
 			idx_uri_param_sep = uri.find('&', offset);
 			
-			int idx_uri_value_sep = uri.find('=', offset);
+			size_t idx_uri_value_sep = uri.find('=', offset);
 			if (idx_uri_value_sep != -1)
 			{
 				string key = uri.substr(offset, idx_uri_value_sep - offset);
@@ -55,23 +55,23 @@ int Request::TryParse(string content)
 		}
 	}
 
-	int idx_protocol_sep = content.find("/", idx_protocol + 1);
+	size_t idx_protocol_sep = content.find("/", idx_protocol + 1);
 	if (idx_protocol_sep == -1)
 		return 6;
 	m_sProtocolName = content.substr(idx_protocol + 1, idx_protocol_sep - idx_protocol - 1);
 
-	int idx_firstEnd = content.find("\r\n");
+	size_t idx_firstEnd = content.find("\r\n");
 	if (idx_firstEnd == -1)
 		return 7;
 	m_sProtocolVersion = content.substr(idx_protocol_sep + 1, idx_firstEnd - idx_protocol_sep - 1);
 
-	int idx_begin = idx_firstEnd + 2;
-	int idx_end = 0;
+	size_t idx_begin = idx_firstEnd + 2;
+	size_t idx_end = 0;
 
 	while (idx_end + 4 < (int)content.length())
 	{
 		idx_end = content.find("\r\n", idx_begin);
-		int idx_separator = content.find(":", idx_begin);
+		size_t idx_separator = content.find(":", idx_begin);
 		if (idx_separator != -1)
 		{
 			m_lsHeaders.push_back(pair<string, string>(

@@ -169,11 +169,11 @@ int main(int argc, CHAR argv[])
 	ZeroMemory(pszConfigPath, MAX_PATH);
 	GetModuleFileNameA(NULL, pszConfigPath, MAX_PATH);
 	string path(pszConfigPath);
-	int sep = path.find_last_of('\\', path.size());
+	size_t sep = path.find_last_of('\\', path.size());
 	string dir = path.substr(0, sep);
 
 	if (argc > 1)
-		sINIFileName = (char*)(*((int*)argv + 1));
+		sINIFileName = ((char**)argv)[1];
 	else
 		sINIFileName = dir + "\\config.ini";
 
@@ -189,10 +189,10 @@ int main(int argc, CHAR argv[])
 		sResourcePath = INI_GetString(pFile, "General", "ResourcePath", dir.c_str());
 		sRedirectionListPath = INI_GetString(pFile, "General", "RedirectionListPath", "");
 
-		int pcnt1 = sRedirectionListPath.find('%');
+		size_t pcnt1 = sRedirectionListPath.find('%');
 		if (pcnt1 != -1)
 		{
-			int pcnt2 = sRedirectionListPath.find('%', pcnt1 + 1);
+			size_t pcnt2 = sRedirectionListPath.find('%', pcnt1 + 1);
 			string valname = sRedirectionListPath.substr(pcnt1 + 1, pcnt2 - pcnt1 - 1);
 			if (valname == "ResourcePath")
 			{
@@ -228,16 +228,16 @@ int main(int argc, CHAR argv[])
 		fclose(pFile);
 
 		string redir = ss.str();
-		int n1 = 0;
+		size_t n1 = 0;
 		while (n1 < (int)redir.size())
 		{
-			int n2 = redir.find('\n', n1);
+			size_t n2 = redir.find('\n', n1);
 			if (n2 == -1)
 				n2 = redir.size();
 
 			string line = redir.substr(n1, n2 - n1);
 
-			int sep = line.find('=');
+			size_t sep = line.find('=');
 			if (sep != -1)
 			{
 				RedirectionList.push_back(pair<string, string>(

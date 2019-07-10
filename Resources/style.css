@@ -1,3 +1,124 @@
-﻿body{
+﻿
+html,body{
+	height:100%;
+	margin:0px;
+	padding:0px
+}
+
+header {
+	
+}
+
+container {
+	
+}
+
+footer {
+	
+}
+
+.login_body {
+	background-color: #F5F5F5;
+	height:100%;
+	margin:0px;
+	padding:0px
+}
+
+.login_header {
+	height: 135px;
+	background-color: #19364D;
+}
+
+.login_panel {
+	box-shadow: 0 0 5px rgba(0,0,0,0.5);
 	background-color: white;
+	margin: -40px auto 0px auto;
+	padding: 40px 0px;
+	height: 285px;
+	width: 620px;
+}
+
+.login_panel_title {
+	user-select: none;
+	line-height: 42px;
+	text-align: center;
+	vertical-align: middle;
+	font-size: 27px;
+	font-family: Roboto,sans-serif;
+	color: #413f4d;
+}
+
+.login_form {
+	background-color: red;
+	width: 235px;
+	margin: 46px auto 0px;
+}
+
+.login_input {
+	height: 40px;
+	margin: 0px 0px 18px 0px;
+}
+
+.login_input input {
+	height: 100%;
+	border: 1px solid #82c1e8;
+	border-radius: 4px;
+	width: 100%;
+}
+
+button {
+	border-radius: 4px;
+	background-color: #4A97D9;
+	margin: 0;
+	padding: 0;
+	height: 40px;
+	width: 100%;
+}
+
+td { 
+	vertical-align: top;
+}
+
+.gtable {
+	height: 100%;
+	border-spacing: 0;
+}
+
+.td_menu { 
+	vertical-align: top;
+	padding: 0;
+	width: 220px;
+	background-color: #F5F5F5;
+}
+
+.menu { 
+
+}
+
+.nav_bar {
+	list-style-type: none;
+	margin: 0px 20px;
+	padding: 0;
+}
+
+.menu_group {
+	padding: 30px 10px 5px 10px;
+	margin: 0;
+	color: #403F4C;
+	font: bold 15px arial;
+}
+
+.menu_item {
+	color: #403F4C;
+	text-decoration: none;
+	display: block;
+	padding: 5px 10px;
+	margin: 0;
+	font: normal 15px arial;
+	border: 1px solid #F5F5F5;
+}
+
+.menu_item:hover {
+	background-color: white;
+	border-color: #E6E6E6;
 }

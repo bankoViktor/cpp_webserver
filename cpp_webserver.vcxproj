@@ -173,20 +173,27 @@
     <None Include="Resources\dashboard.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="Resources\devices.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Resources\history.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="Resources\login.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Resources\logout.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="Resources\menu.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Resources\page1.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="Resources\page2.htm">
+    <None Include="Resources\menu.shtm" />
+    <None Include="Resources\schedule.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="Resources\style.css" />
-    <None Include="Resources\_dashboard.htm">
+    <None Include="Resources\sysmonitor.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>

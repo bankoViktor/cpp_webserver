@@ -1,0 +1,12 @@
+<div class="menu">
+	<ul class="nav_bar">
+		<li class="menu_group">Статус</li>
+		<li><a class="menu_item" href="sysmonitor.htm">Системный монитор</a></li>
+		<li class="menu_group">Управление</li>
+		<li><a class="menu_item" href="devices.htm">Устройства</a></li>
+		<li><a class="menu_item" href="schedule.htm">Расписание</a></li>
+		<li><a class="menu_item" href="history.htm">История</a></li>
+		<li class="menu_group"></li>
+		<li><a class="menu_item" href="logout.htm">Выйти</a></li>
+	</ul>
+</div>

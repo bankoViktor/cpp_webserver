@@ -49,9 +49,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\_dashboard.htm">
-      <Filter>Resource</Filter>
-    </None>
     <None Include="Resources\dashboard.htm">
       <Filter>Resource</Filter>
     </None>
@@ -61,13 +58,25 @@
     <None Include="Resources\menu.htm">
       <Filter>Resource</Filter>
     </None>
-    <None Include="Resources\page1.htm">
-      <Filter>Resource</Filter>
-    </None>
-    <None Include="Resources\page2.htm">
-      <Filter>Resource</Filter>
-    </None>
     <None Include="Resources\style.css">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\devices.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\history.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\logout.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\menu.shtm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\schedule.htm">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="Resources\sysmonitor.htm">
       <Filter>Resource</Filter>
     </None>
   </ItemGroup>

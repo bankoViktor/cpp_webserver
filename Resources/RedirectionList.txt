@@ -1,1 +1,1 @@
-/=/_dashboard.htm
+/=/dashboard.htm

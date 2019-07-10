@@ -38,9 +38,8 @@ public:
 	void Run();
 	string Receive(SOCKET socket);
 	void Transmit(SOCKET socket, Response* pResponse);
-	void Transmit(SOCKET socket, const char* pData, const int size);
+	void Transmit(SOCKET socket, const char* pData, const size_t size);
 	void MakeResponse(Response* pResponse);
-	bool LoadFile(const char* pszFileName, char** ppData, int* pSize, const char* pMode);
 
 private:
 	unsigned int m_port;
@@ -50,7 +49,9 @@ private:
 
 private:
 	string GetTruePathToResource(string pszResourceName);
+	bool SSI_Handle(char** ppData, int* pSize);
 	static int AcceptingLoop(Server* pServer);
 	static int RequestHandling(Server* pServer, SOCKET clientSocket);
-	static void Replace(string * pStr, int offset, char oldChar, char newChar);
+	static void Replace(string* pStr, int offset, char oldChar, char newChar);
+	static bool LoadFile(const char* pszFileName, char** ppData, int* pSize, const char* pMode);
 };
